@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 
@@ -13,7 +14,7 @@ public class PlayerController : MonoBehaviour {
     public AudioSource winSource;
 
     private Rigidbody rb;
-    //private AudioSource audioSource;
+    private int frameWait = 0;
     private Vector3 lastPosition;
     private bool foundObject = false;
     private float time;
@@ -33,25 +34,57 @@ public class PlayerController : MonoBehaviour {
         var fraction = (time * 100) % 100;
 
         //update the label value
-        return string.Format("{0:0}m {1:0}s {2:00}ms", minutes, seconds, fraction);
+        return string.Format("{0:0}:{1:00}:{2:00}", minutes, seconds, fraction);
     }
 
-	void FixedUpdate() {
-		float moveHorizontal = Input.GetAxis ("Horizontal");
-		float moveVertical = Input.GetAxis ("Vertical");
+    private string getTotalSeconds()
+    {
+        time += Time.deltaTime;
+        return string.Format("{0:0}", time % 60);
+    }
 
-		var movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
+    void Update()
+    {
+        //if (Input.GetKeyUp(KeyCode.R) && foundObject)
+        if (Input.GetKeyUp(KeyCode.R))
+        {
+            // reset the maze
+            SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
+        }
+    }
+
+    private void updateBallSound(Vector3 movement)
+    {
         var velocity = System.Math.Abs((rb.velocity.x + rb.velocity.z));
         rollSource.volume = velocity * 0.05f;
         rollSource.pitch = (velocity * 0.03f) + 0.7f;
+    }
 
-        rb.AddForce (movement * speed);
+    void FixedUpdate()
+    {
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+
+
+        var movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        updateBallSound(movement);
+
+        rb.AddForce(movement * speed);
         if (!foundObject)
         {
             SetCountText();
         }
-	}
 
+        // Make win text go crazy
+        if (foundObject && frameWait > 4)
+        {
+            winText.color = new Color(Random.Range(0F, 1F), Random.Range(0F, 1F), Random.Range(0F, 1F));
+            frameWait = 0;
+        } else
+        {
+            frameWait = frameWait + 1;
+        }
+    }
 	void OnTriggerEnter(Collider other) {
 		if(other.gameObject.CompareTag("Pick Up")) {
 			other.gameObject.SetActive (false);
@@ -73,10 +106,11 @@ public class PlayerController : MonoBehaviour {
 
     private void SetCountText() {
 		var timer = getTimer ();
-		countText.text = string.Format("Timer: {0}", timer);
+		countText.text = string.Format("TIMER {0}", timer);
 		if (foundObject) {
-			winText.text = string.Format("You found it in {0}!", timer);
+			winText.text = string.Format("You found it in\n{0} seconds!\nPress 'r' to restart", getTotalSeconds());
             winSource.Play();
         }
 	}
+
 }
