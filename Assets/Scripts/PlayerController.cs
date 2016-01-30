@@ -40,21 +40,10 @@ public class PlayerController : MonoBehaviour {
 		float moveHorizontal = Input.GetAxis ("Horizontal");
 		float moveVertical = Input.GetAxis ("Vertical");
 
-		Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
-
-        if (moveHorizontal == 0f && moveVertical == 0f)
-        {
-            if (rollSource.isPlaying)
-            {
-                rollSource.Pause();
-                //print("Pause");
-            }            
-        }
-        else if (!rollSource.isPlaying)
-        {
-            rollSource.UnPause();
-            //print("UnPause");
-        }
+		var movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
+        var velocity = System.Math.Abs((rb.velocity.x + rb.velocity.z));
+        rollSource.volume = velocity * 0.05f;
+        rollSource.pitch = (velocity * 0.03f) + 0.7f;
 
         rb.AddForce (movement * speed);
         if (!foundObject)
