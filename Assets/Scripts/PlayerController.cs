@@ -44,17 +44,6 @@ public class PlayerController : MonoBehaviour {
         var velocity = System.Math.Abs((rb.velocity.x + rb.velocity.z));
         rollSource.volume = velocity * 0.05f;
         rollSource.pitch = (velocity * 0.03f) + 0.7f;
-        //if (velocitySum < 0.2f)
-        //{
-        //    if (rollSource.isPlaying)
-        //    {
-        //        rollSource.Pause();
-        //    }
-        //}
-        //else if (!rollSource.isPlaying)
-        //{
-        //    rollSource.UnPause();
-        //}
 
         rb.AddForce (movement * speed);
         if (!foundObject)
