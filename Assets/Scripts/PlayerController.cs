@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
@@ -53,10 +52,16 @@ public class PlayerController : MonoBehaviour {
     void Update()
     {
         //if (Input.GetKeyUp(KeyCode.R) && foundObject)
-        if (Input.GetKeyUp(KeyCode.R))
+        if (Input.GetKey(KeyCode.R))
         {
             // reset the maze
-            SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
+            SceneManager.LoadScene(0, LoadSceneMode.Single);
+        }
+
+        if (Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Escape))
+        {
+            // quit
+            Application.Quit();
         }
 
         if (Input.GetKey(KeyCode.C) && camTimeout > 10)
