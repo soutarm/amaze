@@ -8,13 +8,17 @@ public class PlayerController : MonoBehaviour {
 	public float speed;
 	public Text countText;
 	public Text winText;
+    public Text camText;
     
     public AudioSource rollSource;
     public AudioSource impactSource;
     public AudioSource winSource;
 
+    public Camera cam1;
+    public Camera cam2;
+
     private Rigidbody rb;
-    private int frameWait = 0;
+    private int frameWait = 0, camTimeout = 0;
     private Vector3 lastPosition;
     private bool foundObject = false;
     private float time;
@@ -24,7 +28,10 @@ public class PlayerController : MonoBehaviour {
         //audioSource = GetComponent<AudioSource>();
 
         winText.text = string.Empty;
-	}
+        cam1.enabled = true;
+        cam2.enabled = false;
+        SetCamText();
+    }
 
 	private string getTimer() {
         time += Time.deltaTime;
@@ -51,6 +58,18 @@ public class PlayerController : MonoBehaviour {
             // reset the maze
             SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
         }
+
+        if (Input.GetKey(KeyCode.C) && camTimeout > 10)
+        {
+            // toggle camera
+            cam1.enabled = !cam1.enabled;
+            cam2.enabled = !cam2.enabled;
+            camTimeout = 0;
+
+            SetCamText();
+        }
+        // Prevents toggling camera repeatedly
+        camTimeout = camTimeout + 1;
     }
 
     private void updateBallSound(Vector3 movement)
@@ -104,9 +123,14 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    private void SetCamText()
+    {
+        camText.text = cam1.enabled ? "Chase Cam" : "Bird's Eye";
+    }
+
     private void SetCountText() {
 		var timer = getTimer ();
-		countText.text = string.Format("TIMER {0}", timer);
+		countText.text = string.Format("TIME {0}", timer);
 		if (foundObject) {
 			winText.text = string.Format("You found it in\n{0} seconds!\nPress 'r' to restart", getTotalSeconds());
             winSource.Play();
